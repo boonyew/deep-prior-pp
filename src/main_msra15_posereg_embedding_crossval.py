@@ -30,7 +30,7 @@ from util.helpers import shuffle_many_inplace
 matplotlib.use('Agg')  # plot to file
 import matplotlib.pyplot as plt
 import os
-import cPickle
+import pickle
 from trainer.poseregnettrainer import PoseRegNetTrainer, PoseRegNetTrainerParams
 from net.poseregnet import PoseRegNetParams, PoseRegNet
 from data.importers import MSRA15Importer
@@ -63,11 +63,11 @@ if __name__ == '__main__':
     Seq8 = di.loadSequence('P8', shuffle=True, rng=rng, docom=docom)
     seqs = [Seq0, Seq1, Seq2, Seq3, Seq4, Seq5, Seq6, Seq7, Seq8]
 
-    for icv in xrange(len(seqs)):
+    for icv in range(len(seqs)):
         trainSeqs = [s for i, s in enumerate(seqs) if i != icv]
         testSeqs = [seqs[icv]]
-        print "training: {}".format(' '.join([s.name for s in trainSeqs]))
-        print "testing: {}".format(' '.join([s.name for s in testSeqs]))
+        print("training: {}".format(' '.join([s.name for s in trainSeqs])))
+        print("testing: {}".format(' '.join([s.name for s in testSeqs])))
 
         # create training data
         trainDataSet = MSRA15Dataset(trainSeqs, localCache=False)
@@ -100,7 +100,7 @@ if __name__ == '__main__':
         shuffle_many_inplace([train_data, train_gt3D, train_data_cube, train_data_com, train_gt3Dcrop, train_data_M], random_state=rng)
 
         mb = (train_data.nbytes) / (1024 * 1024)
-        print("data size: {}Mb".format(mb))
+        print(("data size: {}Mb".format(mb)))
 
         testDataSet = MSRA15Dataset(testSeqs)
         test_data, test_gt3D = testDataSet.imgStackDepthOnly(testSeqs[0].name)
@@ -108,8 +108,8 @@ if __name__ == '__main__':
         val_data = test_data
         val_gt3D = test_gt3D
 
-        print train_gt3D.max(), test_gt3D.max(), train_gt3D.min(), test_gt3D.min()
-        print train_data.max(), test_data.max(), train_data.min(), test_data.min()
+        print(train_gt3D.max(), test_gt3D.max(), train_gt3D.min(), test_gt3D.min())
+        print(train_data.max(), test_data.max(), train_data.min(), test_data.min())
 
         imgSizeW = train_data.shape[3]
         imgSizeH = train_data.shape[2]
@@ -210,16 +210,16 @@ if __name__ == '__main__':
 
         hpe = MSRAHandposeEvaluation(gt3D, joints)
         hpe.subfolder += '/'+eval_prefix+'/'
-        print("Train samples: {}, test samples: {}".format(train_data.shape[0], len(gt3D)))
-        print("Mean error: {}mm, max error: {}mm".format(hpe.getMeanError(), hpe.getMaxError()))
-        print("{}".format([hpe.getJointMeanError(j) for j in range(joints[0].shape[0])]))
-        print("{}".format([hpe.getJointMaxError(j) for j in range(joints[0].shape[0])]))
+        print(("Train samples: {}, test samples: {}".format(train_data.shape[0], len(gt3D))))
+        print(("Mean error: {}mm, max error: {}mm".format(hpe.getMeanError(), hpe.getMaxError())))
+        print(("{}".format([hpe.getJointMeanError(j) for j in range(joints[0].shape[0])])))
+        print(("{}".format([hpe.getJointMaxError(j) for j in range(joints[0].shape[0])])))
 
         # save results
-        cPickle.dump(gt3D, open("./eval/{}/gt_{}.pkl".format(eval_prefix, icv), "wb"), protocol=cPickle.HIGHEST_PROTOCOL)
-        cPickle.dump(joints, open("./eval/{}/result_{}.pkl".format(eval_prefix, icv), "wb"), protocol=cPickle.HIGHEST_PROTOCOL)
+        pickle.dump(gt3D, open("./eval/{}/gt_{}.pkl".format(eval_prefix, icv), "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(joints, open("./eval/{}/result_{}.pkl".format(eval_prefix, icv), "wb"), protocol=pickle.HIGHEST_PROTOCOL)
 
-        print "Testing baseline"
+        print("Testing baseline")
 
         #################################
         # BASELINE
@@ -241,17 +241,17 @@ if __name__ == '__main__':
 
     ###########################################
     # evaluation
-    print "Result of cross-validation:"
+    print("Result of cross-validation:")
     all_gt = []
     all_results = []
-    for icv in xrange(len(seqs)):
-        all_gt.extend(cPickle.load(open("./eval/{}/gt_{}.pkl".format(eval_prefix, icv), "rb")))
-        all_results.extend(cPickle.load(open("./eval/{}/result_{}.pkl".format(eval_prefix, icv), "rb")))
+    for icv in range(len(seqs)):
+        all_gt.extend(pickle.load(open("./eval/{}/gt_{}.pkl".format(eval_prefix, icv), "rb")))
+        all_results.extend(pickle.load(open("./eval/{}/result_{}.pkl".format(eval_prefix, icv), "rb")))
 
     hpe = MSRAHandposeEvaluation(all_gt, all_results)
     hpe.subfolder += '/'+eval_prefix+'/'
-    print("Mean error: {}mm, max error: {}mm".format(hpe.getMeanError(), hpe.getMaxError()))
-    print("{}".format([hpe.getJointMeanError(j) for j in range(joints[0].shape[0])]))
-    print("{}".format([hpe.getJointMaxError(j) for j in range(joints[0].shape[0])]))
+    print(("Mean error: {}mm, max error: {}mm".format(hpe.getMeanError(), hpe.getMaxError())))
+    print(("{}".format([hpe.getJointMeanError(j) for j in range(joints[0].shape[0])])))
+    print(("{}".format([hpe.getJointMaxError(j) for j in range(joints[0].shape[0])])))
 
     hpe.plotEvaluation(eval_prefix, methodName='Our regr')

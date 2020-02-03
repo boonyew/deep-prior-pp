@@ -56,15 +56,15 @@ class HandposeEvaluation(object):
             raise ValueError("Params must be list or ndarray")
 
         if len(gtjoints) != len(joints):
-            print("Error: groundtruth has {} elements, eval data has {}".format(len(gtjoints), len(joints)))
+            print(("Error: groundtruth has {} elements, eval data has {}".format(len(gtjoints), len(joints))))
             raise ValueError("Params must be the same size")
 
         if len(gtjoints) == len(joints) == 0:
-            print("Error: groundtruth has {} elements, eval data has {}".format(len(gtjoints), len(joints)))
+            print(("Error: groundtruth has {} elements, eval data has {}".format(len(gtjoints), len(joints))))
             raise ValueError("Params must be of non-zero size")
 
         if gtjoints[0].shape != joints[0].shape:
-            print("Error: groundtruth has {} dims, eval data has {}".format(gtjoints[0].shape, joints[0].shape))
+            print(("Error: groundtruth has {} dims, eval data has {}".format(gtjoints[0].shape, joints[0].shape)))
             raise ValueError("Params must be of same dimensionality")
 
         self.gtjoints = numpy.asarray(gtjoints)
@@ -523,10 +523,10 @@ class HandposeEvaluation(object):
                 png_writer.Write()
             elif key == "c":
                 camera = renderer.GetActiveCamera()
-                print "Camera settings:"
-                print "  * position:        %s" % (camera.GetPosition(),)
-                print "  * focal point:     %s" % (camera.GetFocalPoint(),)
-                print "  * up vector:       %s" % (camera.GetViewUp(),)
+                print("Camera settings:")
+                print("  * position:        %s" % (camera.GetPosition(),))
+                print("  * focal point:     %s" % (camera.GetFocalPoint(),))
+                print("  * up vector:       %s" % (camera.GetViewUp(),))
 
         class vtkTimerCallback():
             def __init__(self):
@@ -549,7 +549,7 @@ class HandposeEvaluation(object):
 
             pcl = self.getPCL(dpt, T)
 
-            for k in xrange(pcl.shape[0]):
+            for k in range(pcl.shape[0]):
                 point = pcl[k]
                 pointCloud.addPoint(point)
 
@@ -911,3 +911,65 @@ class MSRAHandposeEvaluation(HandposeEvaluation):
         """
 
         return MSRA15Importer.depthToPCL(dpt, T)
+
+class IntelHandposeEvaluation(HandposeEvaluation):
+    """
+    Different evaluation metrics for handpose specific for ICVL dataset
+    """
+
+    def __init__(self, gt, joints, dolegend=True, linewidth=1):
+        """
+        Initialize class
+
+        :type gt: groundtruth joints
+        :type joints: calculated joints
+        """
+
+        super(IntelHandposeEvaluation, self).__init__(gt, joints, dolegend, linewidth)
+        import matplotlib.colors
+
+        # setup specific stuff
+        self.jointNames = ['C', 'T1', 'T2', 'T3', 'T4', 'I1', 'I2', 'I3', 'I4', 'M1', 'M2', 'M3', 'M4', 'R1', 'R2',
+                           'R3', 'R4', 'P1', 'P2', 'P3', 'P4']
+        self.jointColors = [matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.00, 0, 0.0]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.00, 1, 0.4]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.00, 1, 0.6]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.00, 1, 0.8]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.00, 1, 1.0]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.33, 1, 0.4]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.33, 1, 0.6]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.33, 1, 0.8]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.33, 1, 1.0]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.50, 1, 0.4]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.50, 1, 0.6]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.50, 1, 0.8]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.50, 1, 1.0]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.66, 1, 0.4]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.66, 1, 0.6]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.66, 1, 0.8]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.66, 1, 1.0]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.83, 1, 0.4]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.83, 1, 0.6]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.83, 1, 0.8]]]))[0, 0],
+                            matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.83, 1, 1.0]]]))[0, 0]]
+        self.jointConnections = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8], [0, 9], [9, 10],
+                                 [10, 11], [11, 12], [0, 13], [13, 14], [14, 15], [15, 16], [0, 17], [17, 18], [18, 19],
+                                 [19, 20]]
+        self.jointConnectionColors = [matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.00, 1, 0.4]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.00, 1, 0.6]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.00, 1, 0.8]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.00, 1, 1]]]))[0, 0],
+                                      matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.33, 1, 0.4]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.33, 1, 0.6]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.33, 1, 0.8]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.33, 1, 1]]]))[0, 0],
+                                      matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.50, 1, 0.4]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.50, 1, 0.6]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.50, 1, 0.8]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.50, 1, 1]]]))[0, 0],
+                                      matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.66, 1, 0.4]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.66, 1, 0.6]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.66, 1, 0.8]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.66, 1, 1]]]))[0, 0],
+                                      matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.83, 1, 0.4]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.83, 1, 0.6]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.83, 1, 0.8]]]))[0, 0], matplotlib.colors.hsv_to_rgb(numpy.asarray([[[0.83, 1, 1]]]))[0, 0]]
+
+        self.plotMaxJointDist = 80
+        self.VTKviewport = [0, 0, 180, 40, 40]
+        self.fps = 20.0
+
+    def getPCL(self, dpt, T):
+        """
+        Get pointcloud from frame
+        :param dpt: depth image
+        :param T: 2D transformation of crop
+        """
+
+        return IntelImporter.depthToPCL(dpt, T)

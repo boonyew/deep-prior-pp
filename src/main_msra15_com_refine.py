@@ -29,7 +29,7 @@ from net.scalenet import ScaleNetParams, ScaleNet
 from trainer.scalenettrainer import ScaleNetTrainerParams, ScaleNetTrainer
 from util.handdetector import HandDetector
 import os
-import cPickle
+import pickle
 from data.importers import MSRA15Importer
 from data.dataset import MSRA15Dataset
 from util.handpose_evaluation import MSRAHandposeEvaluation
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     shuffle_many_inplace([train_data, train_gt3D, train_data_com, train_data_cube, train_data_M], random_state=rng)
 
     mb = (train_data.nbytes) / (1024 * 1024)
-    print("data size: {}Mb".format(mb))
+    print(("data size: {}Mb".format(mb)))
 
     testDataSet = MSRA15Dataset(testSeqs)
     test_data, test_gt3D = testDataSet.imgStackDepthOnly(testSeqs[0].name)
@@ -171,8 +171,8 @@ if __name__ == '__main__':
     yend = ystart + dsize[1]
     test_data4 = test_data[:, :, ystart:yend, xstart:xend]
 
-    print train_gt3D.max(), test_gt3D.max(), train_gt3D.min(), test_gt3D.min()
-    print train_data.max(), test_data.max(), train_data.min(), test_data.min()
+    print(train_gt3D.max(), test_gt3D.max(), train_gt3D.min(), test_gt3D.min())
+    print(train_data.max(), test_data.max(), train_data.min(), test_data.min())
 
     imgSizeW = train_data.shape[3]
     imgSizeH = train_data.shape[2]
@@ -235,23 +235,23 @@ if __name__ == '__main__':
     gt3D = [j.gt3Dorig[di.crop_joint_idx].reshape(1, 3) for j in testSeqs[0].data]
     jts = poseNet.computeOutput([test_data, test_data2, test_data4])
     joints = []
-    for i in xrange(test_data.shape[0]):
+    for i in range(test_data.shape[0]):
         joints.append(jts[i].reshape(1, 3)*(testSeqs[0].config['cube'][2]/2.) + testSeqs[0].data[i].com)
 
     hpe = MSRAHandposeEvaluation(gt3D, joints)
     hpe.subfolder += '/'+eval_prefix+'/'
-    print("Mean error: {}mm, max error: {}mm".format(hpe.getMeanError(), hpe.getMaxError()))
+    print(("Mean error: {}mm, max error: {}mm".format(hpe.getMeanError(), hpe.getMaxError())))
 
     # save results
-    cPickle.dump(joints, open("./eval/{}/result_{}_{}.pkl".format(eval_prefix,os.path.split(__file__)[1],eval_prefix), "wb"), protocol=cPickle.HIGHEST_PROTOCOL)
+    pickle.dump(joints, open("./eval/{}/result_{}_{}.pkl".format(eval_prefix,os.path.split(__file__)[1],eval_prefix), "wb"), protocol=pickle.HIGHEST_PROTOCOL)
 
-    print "Testing baseline"
+    print("Testing baseline")
 
     #################################
     # BASELINE
     com = [j.com for j in testSeqs[0].data]
     hpe_com = MSRAHandposeEvaluation(gt3D, numpy.asarray(com).reshape((len(gt3D), 1, 3)))
     hpe_com.subfolder += '/'+eval_prefix+'/'
-    print("Mean error: {}mm".format(hpe_com.getMeanError()))
+    print(("Mean error: {}mm".format(hpe_com.getMeanError())))
 
     hpe.plotEvaluation(eval_prefix, methodName='Our regr', baseline=[('CoM', hpe_com)])

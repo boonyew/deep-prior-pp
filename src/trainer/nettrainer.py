@@ -210,22 +210,22 @@ class NetTrainer(object):
             if hasattr(self, key):
                 print("Reusing shared variables!")
                 if self.trainSize > self.getGPUMemAligned():
-                    print("Loading {} macro batches a {}MB".format(self.getNumMacroBatches(), self.getGPUMemAligned()))
+                    print(("Loading {} macro batches a {}MB".format(self.getNumMacroBatches(), self.getGPUMemAligned())))
                     # load first macro batch
                     idx = self.getNumSamplesPerMacroBatch()
                     self.replaceTrainingData(0, idx)
                 else:
-                    print("Loading single macro batch {}/{}MB".format(self.trainSize, self.getGPUMemAligned()))
+                    print(("Loading single macro batch {}/{}MB".format(self.trainSize, self.getGPUMemAligned())))
                     self.replaceTrainingData(0, self.train_data_xDB.shape[0])
             else:
                 # load shared data
                 if self.trainSize > self.getGPUMemAligned():
-                    print("Loading {} macro batches a {}MB".format(self.getNumMacroBatches(), self.getGPUMemAligned()))
+                    print(("Loading {} macro batches a {}MB".format(self.getNumMacroBatches(), self.getGPUMemAligned())))
                     # load first macro batch
                     idx = self.getNumSamplesPerMacroBatch()
                     setattr(self, key, theano.shared(getattr(self, key+'DB')[:idx], name=key, borrow=True))
                 else:
-                    print("Loading single macro batch {}/{}MB".format(self.trainSize, self.getGPUMemAligned()))
+                    print(("Loading single macro batch {}/{}MB".format(self.trainSize, self.getGPUMemAligned())))
                     setattr(self, key, theano.shared(getattr(self, key+'DB'), name=key, borrow=True))
 
     def setData(self, train_data, train_y, val_data, val_y, max_train_size=0):
@@ -288,31 +288,31 @@ class NetTrainer(object):
         self.val_data_xDB = val_data
         self.val_data_yDB = val_y
 
-        print("Train size: {}MB, Memory available: {}MB, sample size: {}MB, aligned memory: {}MB".format(
-            self.trainSize, self.memorySize, self.sampleSize, self.getGPUMemAligned()))
-        print("{} train samples, {} val samples, batch size {}".format(
-            train_data.shape[0], val_data.shape[0], self.cfgParams.batch_size))
-        print("{} macro batches, {} mini batches per macro, {} full mini batches total".format(
-            self.getNumMacroBatches(), self.getNumMiniBatchesPerMacroBatch(), self.getNumMiniBatches()))
-        print("{} data chunks, {} train samples total".format(self.numChunks, self.numTrainSamples))
+        print(("Train size: {}MB, Memory available: {}MB, sample size: {}MB, aligned memory: {}MB".format(
+            self.trainSize, self.memorySize, self.sampleSize, self.getGPUMemAligned())))
+        print(("{} train samples, {} val samples, batch size {}".format(
+            train_data.shape[0], val_data.shape[0], self.cfgParams.batch_size)))
+        print(("{} macro batches, {} mini batches per macro, {} full mini batches total".format(
+            self.getNumMacroBatches(), self.getNumMiniBatchesPerMacroBatch(), self.getNumMiniBatches())))
+        print(("{} data chunks, {} train samples total".format(self.numChunks, self.numTrainSamples)))
 
         # shared variable already exists?
         if hasattr(self, 'train_data_x'):
             print("Reusing shared variables!")
             if self.trainSize > self.getGPUMemAligned():
-                print("Loading {} macro batches a {}MB".format(self.getNumMacroBatches(), self.getGPUMemAligned()))
+                print(("Loading {} macro batches a {}MB".format(self.getNumMacroBatches(), self.getGPUMemAligned())))
                 # load first macro batch
                 idx = self.getNumSamplesPerMacroBatch()
                 self.replaceTrainingData(0, idx)
                 self.replaceValData(self.val_data_xDB, self.val_data_yDB)
             else:
-                print("Loading single macro batch {}/{}MB".format(self.trainSize, self.getGPUMemAligned()))
+                print(("Loading single macro batch {}/{}MB".format(self.trainSize, self.getGPUMemAligned())))
                 self.replaceTrainingData(0, self.train_data_xDB.shape[0])
                 self.replaceValData(self.val_data_xDB, self.val_data_yDB)
         else:
             # load shared data
             if self.trainSize > self.getGPUMemAligned():
-                print("Loading {} macro batches a {}MB".format(self.getNumMacroBatches(), self.getGPUMemAligned()))
+                print(("Loading {} macro batches a {}MB".format(self.getNumMacroBatches(), self.getGPUMemAligned())))
                 # load first macro batch
                 idx = self.getNumSamplesPerMacroBatch()
                 self.train_data_x = theano.shared(self.train_data_xDB[:idx], name='train_data_x', borrow=True)
@@ -320,7 +320,7 @@ class NetTrainer(object):
                 self.val_data_x = theano.shared(self.val_data_xDB, name='val_data_x', borrow=True)
                 self.val_data_y = theano.shared(self.val_data_yDB, name='val_data_y', borrow=True)
             else:
-                print("Loading single macro batch {}/{}MB".format(self.trainSize, self.getGPUMemAligned()))
+                print(("Loading single macro batch {}/{}MB".format(self.trainSize, self.getGPUMemAligned())))
                 self.train_data_x = theano.shared(self.train_data_xDB, name='train_data_x', borrow=True)
                 self.train_data_y = theano.shared(self.train_data_yDB, name='train_data_y', borrow=True)
                 self.val_data_x = theano.shared(self.val_data_xDB, name='val_data_x', borrow=True)
@@ -375,7 +375,7 @@ class NetTrainer(object):
             alignSize = self.getNumSamplesPerMacroBatch()
 
         if alignSize < data.shape[0]:
-            print "WARNING: aligned size < data size ({}<{})".format(alignSize, data.shape[0])
+            print("WARNING: aligned size < data size ({}<{})".format(alignSize, data.shape[0]))
 
         # pad with zeros to macro batch size, but only along dimension 0 ie samples
         if data.shape[0] == alignSize:
@@ -403,10 +403,10 @@ class NetTrainer(object):
             if self.cfgParams.pad_random:
                 # start from same random seed every time the data is padded, otherwise labels and data mix up
                 rng = numpy.random.RandomState(data.shape[0])
-                for i in xrange(0, alignSize - (data.shape[0] % alignSize)):
+                for i in range(0, alignSize - (data.shape[0] % alignSize)):
                     padded[data.shape[0]+i] = fillData[rng.randint(0, fillData.shape[0])]
             else:
-                for i in xrange(0, alignSize - (data.shape[0] % alignSize)):
+                for i in range(0, alignSize - (data.shape[0] % alignSize)):
                     padded[data.shape[0]+i] = padded[data.shape[0]-1]
 
         if out is None:
@@ -521,8 +521,8 @@ class NetTrainer(object):
                             getattr(self, var+'DB')[:] = self.load_data_queue[var]
                     self.currentChunk = ci
                     next_chunk = numpy.mod(ci + 1, self.numChunks)
-                    print("Received chunk {}, requesting {}".format(ci, next_chunk))
-                    print("Loading chunk {}, last {}".format(next_chunk, False))
+                    print(("Received chunk {}, requesting {}".format(ci, next_chunk)))
+                    print(("Loading chunk {}, last {}".format(next_chunk, False)))
                     self.load_recv_queue.put((next_chunk, self.cfgParams.load_fun_params, False))
 
         force_reload = (((mini_idx % self.getNumMiniBatchesPerChunk()) == self.getNumMiniBatchesPerMacroBatch()-1) and self.cfgParams.force_macrobatch_reload is True and (self.getNumMacroBatches() == 1))
@@ -551,9 +551,9 @@ class NetTrainer(object):
                 do_para_swap()
 
                 next_mbi = numpy.mod(mbi + 1, self.getNumMacroBatches())
-                print("Received macro batch {}, requesting {}".format(mbi, next_mbi))
+                print(("Received macro batch {}, requesting {}".format(mbi, next_mbi)))
                 last, tidx, idxs = self.chunksForMP(next_mbi)
-                print("Loading macro batch {}, last {}, start idx {}, end idx {}".format(next_mbi, last, numpy.min(idxs), numpy.max(idxs)))
+                print(("Loading macro batch {}, last {}, start idx {}, end idx {}".format(next_mbi, last, numpy.min(idxs), numpy.max(idxs))))
                 for i, r in enumerate(self.augment_recv_queue):
                     r.put((next_mbi, self.cfgParams.augment_fun_params, last, tidx[i], idxs[i]))
             elif self.cfgParams.augment_fun_params['fun'] is not None:
@@ -562,7 +562,7 @@ class NetTrainer(object):
 
                 # invoke function to generate new data
                 last, tidx, idxs = self.chunksForMP(macro_idx)
-                print("Loading macro batch {}, last {}, start idx {}, end idx {}".format(macro_idx, last, numpy.min(idxs), numpy.max(idxs)))
+                print(("Loading macro batch {}, last {}, start idx {}, end idx {}".format(macro_idx, last, numpy.min(idxs), numpy.max(idxs))))
                 getattr(self, self.cfgParams.augment_fun_params['fun'])(self.cfgParams.augment_fun_params, macro_idx,
                                                                         last,
                                                                         [itm for sl in tidx for itm in sl],
@@ -583,14 +583,14 @@ class NetTrainer(object):
                 if self.isLastMacroBatch(macro_idx):
                     start_idx = 0
                     end_idx = self.getNumSamplesPerMacroBatch()
-                    print("Loading last macro batch {}, start idx {}, end idx {}".format(macro_idx, start_idx, end_idx))
+                    print(("Loading last macro batch {}, start idx {}, end idx {}".format(macro_idx, start_idx, end_idx)))
                     self.replaceTrainingData(start_idx, end_idx, last=True)
                     # remember current macro batch index
                     self.currentMacroBatch = macro_idx
                 else:
                     start_idx = macro_idx * self.getNumSamplesPerMacroBatch()
                     end_idx = min((macro_idx + 1) * self.getNumSamplesPerMacroBatch(), self.train_data_xDB.shape[0])
-                    print("Loading macro batch {}, start idx {}, end idx {}".format(macro_idx, start_idx, end_idx))
+                    print(("Loading macro batch {}, start idx {}, end idx {}".format(macro_idx, start_idx, end_idx)))
                     self.replaceTrainingData(start_idx, end_idx)
                     # remember current macro batch index
                     self.currentMacroBatch = macro_idx
@@ -684,7 +684,7 @@ class NetTrainer(object):
 
             # prepare next one
             last, tidx, idxs = self.chunksForMP(0)
-            print("Loading macro batch {}, last {}, start idx {}, end idx {}".format(0, last, numpy.min(idxs), numpy.max(idxs)))
+            print(("Loading macro batch {}, last {}, start idx {}, end idx {}".format(0, last, numpy.min(idxs), numpy.max(idxs))))
             for i, r in enumerate(self.augment_recv_queue):
                 r.put((0, self.cfgParams.augment_fun_params, last, tidx[i], idxs[i]))
         elif self.cfgParams.augment_fun_params['fun'] is not None:
@@ -719,7 +719,7 @@ class NetTrainer(object):
             self.load_process.start()
 
             # prepare next one
-            print("Loading chunk {}, last {}".format(0, False))
+            print(("Loading chunk {}, last {}".format(0, False)))
             self.load_recv_queue.put((0, self.cfgParams.load_fun_params, False))
         else:
             pass
@@ -739,8 +739,8 @@ class NetTrainer(object):
             last = False
 
         num_chunks = int(numpy.ceil((end_idx - start_idx) / float(self.cfgParams.para_num_proc)))
-        idxs = list(chunks(range(start_idx, end_idx), num_chunks))
-        tidxs = list(chunks(range(0, (end_idx - start_idx)), num_chunks))
+        idxs = list(chunks(list(range(start_idx, end_idx)), num_chunks))
+        tidxs = list(chunks(list(range(0, (end_idx - start_idx))), num_chunks))
         return last, tidxs, idxs
 
     def unsetDataLoading(self):
@@ -802,13 +802,13 @@ class NetTrainer(object):
         start_time = time.clock()
 
         train_costs = []
-        validation_obs = [[] for x in xrange(1, len(self.validation_observer))]
+        validation_obs = [[] for x in range(1, len(self.validation_observer))]
         self.epoch = 0
 
         self.poseNet.setDeterministic()
         # compute observers on validation set
         for vi in range(1, len(self.validation_observer)):
-            validation_obs[vi-1].append(numpy.nanmean([self.validation_observer[vi](i) for i in xrange(n_val_batches)]))
+            validation_obs[vi-1].append(numpy.nanmean([self.validation_observer[vi](i) for i in range(n_val_batches)]))
         self.poseNet.unsetDeterministic()
 
         while self.epoch < n_epochs:
@@ -826,7 +826,7 @@ class NetTrainer(object):
             self.epoch += 1
             # reduce learning rate
             learning_rate = self.cfgParams.lr_of_ep(self.epoch)
-            for minibatch_index in xrange(self.getNumFullMiniBatches()):
+            for minibatch_index in range(self.getNumFullMiniBatches()):
 
                 if self.cfgParams.pre_minibatch_fn is not None:
                     # invoke function
@@ -839,7 +839,7 @@ class NetTrainer(object):
 
                 minibatch_avg_cost = self.train_model(mini_idx, learning_rate)
 
-                print("minibatch {0:4d}, average cost: {1}".format(minibatch_index, minibatch_avg_cost))
+                print(("minibatch {0:4d}, average cost: {1}".format(minibatch_index, minibatch_avg_cost)))
 
                 if numpy.any(numpy.isnan(minibatch_avg_cost)):
                     # check which vars are nan
@@ -868,17 +868,17 @@ class NetTrainer(object):
                     self.poseNet.setDeterministic()
 
                     # compute cost on validation set
-                    this_validation_loss = numpy.nanmean([self.validation_observer[0](i) for i in xrange(n_val_batches)])
+                    this_validation_loss = numpy.nanmean([self.validation_observer[0](i) for i in range(n_val_batches)])
 
                     # compute observers on validation set
                     for vi in range(1, len(self.validation_observer)):
-                        validation_obs[vi-1].append(numpy.nanmean([self.validation_observer[vi](i) for i in xrange(n_val_batches)]))
+                        validation_obs[vi-1].append(numpy.nanmean([self.validation_observer[vi](i) for i in range(n_val_batches)]))
 
                     self.poseNet.unsetDeterministic()
 
-                    print "{}: epoch {}, LR {}, minibatch {}/{}, validation cost {} error {}".format(
+                    print("{}: epoch {}, LR {}, minibatch {}/{}, validation cost {} error {}".format(
                         time.ctime(), self.epoch, learning_rate, minibatch_index + 1,
-                        self.getNumFullMiniBatches(), this_validation_loss, [vo[-1] for vo in validation_obs])
+                        self.getNumFullMiniBatches(), this_validation_loss, [vo[-1] for vo in validation_obs]))
 
                     # if we got the best validation score until now
                     if this_validation_loss < best_validation_loss:
@@ -893,13 +893,13 @@ class NetTrainer(object):
                 getattr(self, self.cfgParams.post_epoch_fn)()
 
         end_time = time.clock()
-        print('Optimization complete with best validation score of %f,' % best_validation_loss)
-        print('The code run for %d epochs, with %f epochs/sec' % (self.epoch, self.epoch / (end_time - start_time)))
+        print(('Optimization complete with best validation score of %f,' % best_validation_loss))
+        print(('The code run for %d epochs, with %f epochs/sec' % (self.epoch, self.epoch / (end_time - start_time))))
 
         # restore best params if given
         if bestParams is not None and self.cfgParams.use_early_stopping is True:
             self.poseNet.weightVals = bestParams
-            print('Best params at epoch %d' % bestParamsEp)
+            print(('Best params at epoch %d' % bestParamsEp))
 
         if self.cfgParams.augment_fun_params['fun'] is not None or self.cfgParams.load_fun_params['fun'] is not None:
             self.unsetDataLoading()
@@ -914,7 +914,7 @@ class NetTrainer(object):
 
         for param_i in self.params:
             if numpy.any(numpy.isnan(param_i.get_value())):
-                print("NaN in weights", param_i.name)
+                print(("NaN in weights", param_i.name))
 
     def augmentCrop(self, img, gt3Dcrop, com, cube, M, aug_modes, hd, normZeroOne=False, sigma_com=None,
                     sigma_sc=None, rot_range=None):

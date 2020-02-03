@@ -87,7 +87,7 @@ class Dataset(object):
             j, d = label0.shape
             imgStack = numpy.zeros((numImgs, 1, h, w), dtype='float32')  # num_imgs,stack_size,rows,cols
             labelStack = numpy.zeros((numImgs, j, d), dtype='float32')  # num_imgs,joints,dim
-            for i in xrange(numImgs):
+            for i in range(numImgs):
                 if normZeroOne:
                     imgD = numpy.asarray(imgSeq.data[i].dpt.copy(), 'float32')
                     imgD[imgD == 0] = imgSeq.data[i].com[2] + (imgSeq.config['cube'][2] / 2.)
@@ -146,3 +146,13 @@ class NYUDataset(Dataset):
 
         self.lmi = NYUImporter(basepath)
 
+class IntelDataset(Dataset):
+    def __init__(self, imgSeqs=None, basepath=None, localCache=True):
+        """
+        constructor
+        """
+        super(IntelDataset, self).__init__(imgSeqs, localCache)
+        if basepath is None:
+            basepath = '../../data/intel/'
+
+        self.lmi = IntelImporter(basepath)

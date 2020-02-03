@@ -320,8 +320,8 @@ class DepthSenseCameraDevice(CameraDevice):
         try:
             # Wait for new data to be available
             self.ctx.wait_one_update_all(self.depth)
-        except openni.OpenNIError, err:
-            print "Failed updating data:", err
+        except openni.OpenNIError as err:
+            print("Failed updating data:", err)
         else:
             dpt = numpy.asarray(self.depth.get_tuple_depth_map(), dtype='float32').reshape(self.depth.map.height, self.depth.map.width)
 
@@ -337,8 +337,8 @@ class DepthSenseCameraDevice(CameraDevice):
         try:
             # Wait for new data to be available
             self.ctx.wait_one_update_all(self.color)
-        except openni.OpenNIError, err:
-            print "Failed updating data:", err
+        except openni.OpenNIError as err:
+            print("Failed updating data:", err)
         else:
             dpt = numpy.asarray(self.color.get_tuple_depth_map(), dtype='float32').reshape(self.color.map.height, self.color.map.width)
 

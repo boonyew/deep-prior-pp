@@ -29,7 +29,7 @@ import difflib
 import gzip
 import time
 import numpy
-import cPickle
+import pickle
 import re
 from net.convpoollayer import ConvPoolLayer, ConvPoolLayerParams
 from net.convlayer import ConvLayer, ConvLayerParams
@@ -147,7 +147,7 @@ class NetBase(object):
         prms = [p for l in self.layers for p in l.params]
 
         # only unique variables, remove shared weights from list
-        return dict((obj.auto_name, obj) for obj in prms).values()
+        return list(dict((obj.auto_name, obj) for obj in prms).values())
 
     @property
     def params(self):
@@ -162,7 +162,7 @@ class NetBase(object):
         prms = [p for l in self.layers for p in l.params if p.auto_name not in [an.auto_name for an in self._params_filter]]
 
         # only unique variables, remove shared weights from list
-        return dict((obj.auto_name, obj) for obj in prms).values()
+        return list(dict((obj.auto_name, obj) for obj in prms).values())
 
     @property
     def params_filter(self):
@@ -185,7 +185,7 @@ class NetBase(object):
         prms = [p for l in self.layers for p in l.weights]
 
         # only unique variables, remove shared weights from list
-        return dict((obj.auto_name, obj) for obj in prms).values()
+        return list(dict((obj.auto_name, obj) for obj in prms).values())
 
     @property
     def weights(self):
@@ -200,7 +200,7 @@ class NetBase(object):
         prms = [p for l in self.layers for p in l.weights if p.name not in [an.auto_name for an in self._weights_filter]]
 
         # only unique variables, remove shared weights from list
-        return dict((obj.auto_name, obj) for obj in prms).values()
+        return list(dict((obj.auto_name, obj) for obj in prms).values())
 
     @property
     def weights_filter(self):
@@ -307,7 +307,7 @@ class NetBase(object):
                 out[0][i * batch_size:(i + 1) * batch_size] = o.reshape(self.cfgParams.outputDim)
         end = time.time()
         if timeit:
-            print("{} in {}s, {}ms per frame".format(padSize, end - start, (end - start)*1000./padSize))
+            print(("{} in {}s, {}ms per frame".format(padSize, end - start, (end - start)*1000./padSize)))
         if isinstance(self.output, list):
             for k in range(len(self.output)):
                 out[k] = out[k][0:nSamp]
@@ -383,7 +383,7 @@ class NetBase(object):
         if isinstance(value, list):
             assert isinstance(param, list), "tried to assign a list of weights to params, which is not a list {}".format(type(param))
             assert len(param) == len(value), "tried to assign unequal list of weights {} != {}".format(len(param), len(value))
-            for i in xrange(len(value)):
+            for i in range(len(value)):
                 self.recSetWeightVals(param[i], value[i])
         else:
             param.set_value(value)
@@ -417,9 +417,9 @@ class NetBase(object):
             state[key].extend([p.get_value() for p in layer.params_nontrained])
         opener = gzip.open if filename.lower().endswith('.gz') else open
         handle = opener(filename, 'wb')
-        cPickle.dump(state, handle, -1)
+        pickle.dump(state, handle, -1)
         handle.close()
-        print 'Saved model parameter to {}'.format(filename)
+        print('Saved model parameter to {}'.format(filename))
 
     def load(self, filename, raise_on_error=True):
         """
@@ -431,26 +431,26 @@ class NetBase(object):
         if filename is None:
             return
 
-        print 'Loading model parameters from {}'.format(filename)
+        print('Loading model parameters from {}'.format(filename))
 
         opener = gzip.open if filename.lower().endswith('.gz') else open
         handle = opener(filename, 'rb')
-        saved = cPickle.load(handle)
+        saved = pickle.load(handle)
         handle.close()
         if saved['network'] != self.__str__():
-            print "Possibly not matching network configuration!"
+            print("Possibly not matching network configuration!")
             differences = list(difflib.Differ().compare(saved['network'].splitlines(), self.__str__().splitlines()))
-            print "Differences are:"
-            print "\n".join(differences)
+            print("Differences are:")
+            print("\n".join(differences))
         for layer in self.layers:
             if '{}-values'.format(layer.layerNum) not in saved:
                 if raise_on_error:
                     raise ImportError("{} not in saved variables!".format('{}-values'.format(layer.layerNum)))
                 else:
-                    print "WARNING: {} not in saved variables!".format('{}-values'.format(layer.layerNum))
+                    print("WARNING: {} not in saved variables!".format('{}-values'.format(layer.layerNum)))
                 continue
             if (len(layer.params) + len(layer.params_nontrained)) != len(saved['{}-values'.format(layer.layerNum)]):
-                print "Warning: Layer parameters for layer {} do not match. Trying to fit on shape!".format(layer.layerNum)
+                print("Warning: Layer parameters for layer {} do not match. Trying to fit on shape!".format(layer.layerNum))
                 n_assigned = 0
                 for p in layer.params + layer.params_nontrained:
                     for v in saved['{}-values'.format(layer.layerNum)]:
@@ -462,9 +462,9 @@ class NetBase(object):
                     if raise_on_error:
                         raise ImportError("Could not load all necessary variables!")
                     else:
-                        print "WARNING: Could not load all necessary variables!"
+                        print("WARNING: Could not load all necessary variables!")
                 else:
-                    print "Found fitting parameters!"
+                    print("Found fitting parameters!")
             else:
                 for p, v in zip(layer.params + layer.params_nontrained, saved['{}-values'.format(layer.layerNum)]):
                     if p.get_value().shape == v.shape:
@@ -473,5 +473,5 @@ class NetBase(object):
                         if raise_on_error:
                             raise ImportError("Skipping parameter for {}! Shape {} does not fit {}.".format(p.name, p.get_value().shape, v.shape))
                         else:
-                            print "WARNING: Skipping parameter for {}! Shape {} does not fit {}.".format(p.name, p.get_value().shape, v.shape)
-        print 'Done'
+                            print("WARNING: Skipping parameter for {}! Shape {} does not fit {}.".format(p.name, p.get_value().shape, v.shape))
+        print('Done')

@@ -154,22 +154,22 @@ class RealtimeHandposePipeline(object):
             start = time.time()
             ret, frame = device.getDepth()
             if ret is False:
-                print "Error while reading frame."
+                print("Error while reading frame.")
                 time.sleep(0.1)
                 continue
             if self.verbose is True:
-                print("{}ms capturing".format((time.time() - start)*1000.))
+                print(("{}ms capturing".format((time.time() - start)*1000.)))
 
             startd = time.time()
             crop, M, com3D = self.detect(frame.copy())
             if self.verbose is True:
-                print("{}ms detection".format((time.time() - startd)*1000.))
+                print(("{}ms detection".format((time.time() - startd)*1000.)))
 
             self.sync.update(fid=fid, crop=crop, com3D=com3D, frame=frame, M=M)
             fid += 1
 
         # we are done
-        print "Exiting producer..."
+        print("Exiting producer...")
         device.stop()
         return True
 
@@ -197,7 +197,7 @@ class RealtimeHandposePipeline(object):
             pose = self.estimatePose(frm['crop'], frm['com3D'])
             pose = pose * self.sync['config']['cube'][2]/2. + frm['com3D']
             if self.verbose is True:
-                print("{}ms pose".format((time.time() - startp)*1000.))
+                print(("{}ms pose".format((time.time() - startp)*1000.)))
 
             # Display the resulting frame
             starts = time.time()
@@ -211,11 +211,11 @@ class RealtimeHandposePipeline(object):
                 cv2.imshow('crop', numpy.clip((frm['crop'] + 1.)*128., 0, 255).astype('uint8'))
             self.processKey(cv2.waitKey(1) & 0xFF)
             if self.verbose is True:
-                print("{}ms display".format((time.time() - starts)*1000.))
+                print(("{}ms display".format((time.time() - starts)*1000.)))
 
         cv2.destroyAllWindows()
         # we are done
-        print "Exiting consumer..."
+        print("Exiting consumer...")
         return True
 
     def processVideoThreaded(self, device):
@@ -225,10 +225,10 @@ class RealtimeHandposePipeline(object):
         :return: None
         """
 
-        print "Create producer process..."
+        print("Create producer process...")
         p = Process(target=self.threadProducer, args=[device])
         p.daemon = True
-        print"Create consumer process..."
+        print("Create consumer process...")
         c = Process(target=self.threadConsumer, args=[])
         c.daemon = True
         p.start()
@@ -256,22 +256,22 @@ class RealtimeHandposePipeline(object):
             start = time.time()
             ret, frame = device.getDepth()
             if ret is False:
-                print "Error while reading frame."
+                print("Error while reading frame.")
                 time.sleep(0.1)
                 continue
             if self.verbose is True:
-                print("{}ms capturing".format((time.time() - start)*1000.))
+                print(("{}ms capturing".format((time.time() - start)*1000.)))
 
             startd = time.time()
             crop, M, com3D = self.detect(frame.copy())
             if self.verbose is True:
-                print("{}ms detection".format((time.time() - startd)*1000.))
+                print(("{}ms detection".format((time.time() - startd)*1000.)))
 
             startp = time.time()
             pose = self.estimatePose(crop, com3D)
             pose = pose*self.sync['config']['cube'][2]/2. + com3D
             if self.verbose is True:
-                print("{}ms pose".format((time.time() - startp)*1000.))
+                print(("{}ms pose".format((time.time() - startp)*1000.)))
 
             # Display the resulting frame
             starts = time.time()
@@ -286,8 +286,8 @@ class RealtimeHandposePipeline(object):
                 cv2.imshow('crop', numpy.clip((crop + 1.)*128., 0, 255).astype('uint8'))
             self.processKey(cv2.waitKey(1) & 0xFF)
             if self.verbose is True:
-                print("{}ms display".format((time.time() - starts)*1000.))
-                print("-> {}ms per frame".format((time.time() - start)*1000.))
+                print(("{}ms display".format((time.time() - starts)*1000.)))
+                print(("-> {}ms per frame".format((time.time() - start)*1000.)))
 
         # When everything done, release the capture
         cv2.destroyAllWindows()
@@ -312,7 +312,7 @@ class RealtimeHandposePipeline(object):
         if self.state.value == self.STATE_INIT:
             self.handsizes.append(handsz)
             if self.verbose is True:
-                print numpy.median(numpy.asarray(self.handsizes), axis=0)
+                print(numpy.median(numpy.asarray(self.handsizes), axis=0))
         else:
             self.handsizes = []
 
@@ -408,10 +408,10 @@ class RealtimeHandposePipeline(object):
         jtI[:, 0:2] -= numpy.asarray([frame.shape[0]//2, frame.shape[1]//2])
         jtI[:, 0:2] *= upsample
         jtI[:, 0:2] += numpy.asarray([imgcopy.shape[0]//2, imgcopy.shape[1]//2])
-        for i in xrange(handpose.shape[0]):
+        for i in range(handpose.shape[0]):
             cv2.circle(imgcopy, (jtI[i, 0], jtI[i, 1]), 3, (255, 0, 0), -1)
 
-        for i in xrange(len(hpe.jointConnections)):
+        for i in range(len(hpe.jointConnections)):
             cv2.line(imgcopy, (jtI[hpe.jointConnections[i][0], 0], jtI[hpe.jointConnections[i][0], 1]),
                      (jtI[hpe.jointConnections[i][1], 0], jtI[hpe.jointConnections[i][1], 1]),
                      255.*hpe.jointConnectionColors[i], 2)
@@ -428,10 +428,10 @@ class RealtimeHandposePipeline(object):
         jtP[:, 0:2] -= numpy.asarray([frame.shape[0]//2, frame.shape[1]//2])
         jtP[:, 0:2] *= upsample
         jtP[:, 0:2] += numpy.asarray([imgcopy.shape[0]//2, imgcopy.shape[1]//2])
-        for i in xrange(handpose.shape[0]):
+        for i in range(handpose.shape[0]):
             cv2.circle(poseimg, (jtP[i, 0], jtP[i, 1]), 3, (255, 0, 0), -1)
 
-        for i in xrange(len(hpe.jointConnections)):
+        for i in range(len(hpe.jointConnections)):
             cv2.line(poseimg, (jtP[hpe.jointConnections[i][0], 0], jtP[hpe.jointConnections[i][0], 1]),
                      (jtP[hpe.jointConnections[i][1], 0], jtP[hpe.jointConnections[i][1], 1]),
                      255.*hpe.jointConnectionColors[i], 2)

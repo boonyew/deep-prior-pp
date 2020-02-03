@@ -96,7 +96,7 @@ class VtkPointCloud:
         """
         assert len(points.shape) == 2, points.shape
         assert points.shape[1] == 3, points.shape
-        for k in xrange(points.shape[0]):
+        for k in range(points.shape[0]):
             self.addPoint(points[k])
  
     def clearPoints(self):

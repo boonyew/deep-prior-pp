@@ -341,7 +341,7 @@ class ResNet(NetBase):
 
     def add_res_layers(self, rng, inputVar, inputDim, outputFilters, count, stride):
         rout = res_block(self.layers, rng, inputVar, inputDim, outputFilters, stride)
-        for i in xrange(1, count):
+        for i in range(1, count):
             rout = res_block(self.layers, rng, rout, self.layers[-1].cfgParams.outputDim, outputFilters, 1)
         return rout
 

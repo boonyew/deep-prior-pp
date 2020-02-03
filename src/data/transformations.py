@@ -97,7 +97,7 @@ def rotatePoints2D(pts, center, angle):
     :return: rotated points
     """
     ret = pts.copy()
-    for i in xrange(pts.shape[0]):
+    for i in range(pts.shape[0]):
         ret[i] = rotatePoint2D(pts[i], center, angle)
     return ret
 
@@ -150,7 +150,7 @@ def rotatePoints3D(pts, center, angle_x, angle_y, angle_z):
     :return: rotated points
     """
     ret = pts.copy()
-    for i in xrange(pts.shape[0]):
+    for i in range(pts.shape[0]):
         ret[i] = rotatePoint3D(pts[i], center, angle_x, angle_y, angle_z)
     return ret
 

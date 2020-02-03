@@ -177,7 +177,7 @@ class BatchNormLayer(Layer):
         inv_std += 0 * running_inv_std
 
         # prepare dimshuffle pattern inserting broadcastable axes as needed
-        param_axes = iter(range(inputVar.ndim - len(axes)))
+        param_axes = iter(list(range(inputVar.ndim - len(axes))))
         pattern = ['x' if input_axis in axes else next(param_axes) for input_axis in range(inputVar.ndim)]
 
         # apply dimshuffle pattern to all parameters

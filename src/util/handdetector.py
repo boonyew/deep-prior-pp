@@ -209,7 +209,7 @@ class HandDetector(object):
         :return: xstart, xend, ystart, yend, zstart, zend
         """
         if numpy.isclose(com[2], 0.):
-            print "Warning: CoM ill-defined!"
+            print("Warning: CoM ill-defined!")
             xstart = self.dpt.shape[0]//4
             xend = xstart + self.dpt.shape[0]//2
             ystart = self.dpt.shape[1]//4
@@ -551,7 +551,7 @@ class HandDetector(object):
         :param size: (x,y,z) extent of the source crop volume in mm
         :return: refined com
         """
-        for k in xrange(num_iter):
+        for k in range(num_iter):
             # calculate boundaries
             xstart, xend, ystart, yend, zstart, zend = self.comToBounds(com, size)
 
@@ -740,7 +740,7 @@ class HandDetector(object):
         com3D = self.importer.jointImgTo3D(com)
         joint_2D = self.importer.joints3DToImg(joints3D + com3D)
         data_2D = numpy.zeros_like(joint_2D)
-        for k in xrange(data_2D.shape[0]):
+        for k in range(data_2D.shape[0]):
             data_2D[k] = rotatePoint2D(joint_2D[k], com[0:2], rot)
         new_joints3D = (self.importer.jointsImgTo3D(data_2D) - com3D)
 
@@ -830,7 +830,7 @@ class HandDetector(object):
 
         all_modes = ['none', 'rot', 'sc', 'com', 'rot+com', 'com+rot',
                      'rot+com+sc', 'rot+sc+com', 'sc+rot+com', 'sc+com+rot', 'com+sc+rot', 'com+rot+sc']
-        assert all([aug_modes[i] in all_modes for i in xrange(len(aug_modes))])
+        assert all([aug_modes[i] in all_modes for i in range(len(aug_modes))])
 
         new_poses = numpy.zeros((int(num_poses), base_poses.shape[1], base_poses.shape[2]), dtype=base_poses.dtype)
         new_com = numpy.zeros((int(num_poses), 3), dtype=base_poses.dtype)
@@ -847,7 +847,7 @@ class HandDetector(object):
             else:
                 return base_poses / (base_cube[:, 2]/2.)[:, None, None]
 
-        for i in xrange(int(num_poses)):
+        for i in range(int(num_poses)):
             mode = modes[i]
             ridx = ridxs[i]
             cube = base_cube[ridx]

@@ -79,7 +79,7 @@ def cartesian(arrays, out=None):
     out[:, 0] = numpy.repeat(arrays[0], m)
     if arrays[1:]:
         cartesian(arrays[1:], out=out[0:m, 1:])
-        for j in xrange(1, arrays[0].size):
+        for j in range(1, arrays[0].size):
             out[j*m:(j+1)*m, 1:] = out[0:m, 1:]
     return out
 
@@ -102,7 +102,7 @@ def shuffle_many_inplace(arrays, random_state=None):
     assert all(i.shape[0] == arrays[0].shape[0] for i in arrays[1:])
 
     # Fisher-Yates Shuffle
-    for oi in reversed(range(1, arrays[0].shape[0])):
+    for oi in reversed(list(range(1, arrays[0].shape[0]))):
         ni = rng.randint(oi+1)
         for a in arrays:
             a[[oi, ni]] = a[[ni, oi]]
@@ -126,8 +126,8 @@ def gaussian_kernel(kernel_shape, sigma=None):
         return 1. / Z * numpy.exp(-(x ** 2. + y ** 2.) / (2. * s ** 2.))
 
     mid = numpy.floor(kernel_shape / 2.)
-    for i in xrange(0, kernel_shape):
-        for j in xrange(0, kernel_shape):
+    for i in range(0, kernel_shape):
+        for j in range(0, kernel_shape):
             kern[i, j] = gauss(i - mid, j - mid, sigma)
 
     return kern / numpy.sum(kern)
@@ -149,5 +149,5 @@ def chunks(l, n):
     :param n: size of chunk
     :return: iterator
     """
-    for i in xrange(0, len(l), n):
+    for i in range(0, len(l), n):
         yield l[i:i + n]

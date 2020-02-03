@@ -24,7 +24,7 @@ import matplotlib
 matplotlib.use('Agg')  # plot to file
 import matplotlib.pyplot as plt
 import os
-import cPickle
+import pickle
 from sklearn.decomposition import PCA
 from trainer.poseregnettrainer import PoseRegNetTrainer, PoseRegNetTrainerParams
 from net.poseregnet import PoseRegNetParams, PoseRegNet
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     train_gt3Dcrop = numpy.asarray([d.gt3Dcrop for d in Seq1.data], dtype='float32')
 
     mb = (train_data.nbytes) / (1024 * 1024)
-    print("data size: {}Mb".format(mb))
+    print(("data size: {}Mb".format(mb)))
 
     valDataSet = NYUDataset(testSeqs)
     val_data, val_gt3D = valDataSet.imgStackDepthOnly('test_1')
@@ -74,8 +74,8 @@ if __name__ == '__main__':
     test_data1, test_gt3D1 = testDataSet.imgStackDepthOnly('test_1')
     test_data2, test_gt3D2 = testDataSet.imgStackDepthOnly('test_2')
 
-    print train_gt3D.max(), test_gt3D1.max(), train_gt3D.min(), test_gt3D1.min()
-    print train_data.max(), test_data1.max(), train_data.min(), test_data1.min()
+    print(train_gt3D.max(), test_gt3D1.max(), train_gt3D.min(), test_gt3D1.min())
+    print(train_data.max(), test_data1.max(), train_data.min(), test_data1.min())
 
     imgSizeW = train_data.shape[3]
     imgSizeH = train_data.shape[2]
@@ -168,22 +168,22 @@ if __name__ == '__main__':
         # Backtransform from embedding
         # jts = pca.inverse_transform(jts_embed)
         jts = jts_embed
-        for i in xrange(test_data.shape[0]):
+        for i in range(test_data.shape[0]):
             joints.append(jts[i].reshape((-1, 3))*(seq.config['cube'][2]/2.) + seq.data[i].com)
 
     joints = numpy.array(joints)
 
     hpe = NYUHandposeEvaluation(gt3D, joints)
     hpe.subfolder += '/'+eval_prefix+'/'
-    print("Train samples: {}, test samples: {}".format(train_data.shape[0], len(gt3D)))
-    print("Mean error: {}mm, max error: {}mm".format(hpe.getMeanError(), hpe.getMaxError()))
-    print("{}".format([hpe.getJointMeanError(j) for j in range(joints[0].shape[0])]))
-    print("{}".format([hpe.getJointMaxError(j) for j in range(joints[0].shape[0])]))
+    print(("Train samples: {}, test samples: {}".format(train_data.shape[0], len(gt3D))))
+    print(("Mean error: {}mm, max error: {}mm".format(hpe.getMeanError(), hpe.getMaxError())))
+    print(("{}".format([hpe.getJointMeanError(j) for j in range(joints[0].shape[0])])))
+    print(("{}".format([hpe.getJointMaxError(j) for j in range(joints[0].shape[0])])))
 
     # save results
-    cPickle.dump(joints, open("./eval/{}/result_{}_{}.pkl".format(eval_prefix, os.path.split(__file__)[1], eval_prefix), "wb"), protocol=cPickle.HIGHEST_PROTOCOL)
+    pickle.dump(joints, open("./eval/{}/result_{}_{}.pkl".format(eval_prefix, os.path.split(__file__)[1], eval_prefix), "wb"), protocol=pickle.HIGHEST_PROTOCOL)
 
-    print "Testing baseline"
+    print("Testing baseline")
 
     #################################
     # BASELINE
@@ -192,7 +192,7 @@ if __name__ == '__main__':
 
     hpe_base = NYUHandposeEvaluation(gt3D, data_baseline)
     hpe_base.subfolder += '/'+eval_prefix+'/'
-    print("Mean error: {}mm".format(hpe_base.getMeanError()))
+    print(("Mean error: {}mm".format(hpe_base.getMeanError())))
     hpe.plotEvaluation(eval_prefix, methodName='Our regr', baseline=[('Tompson et al.', hpe_base)])
 
     ind = 0

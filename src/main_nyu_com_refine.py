@@ -28,7 +28,7 @@ from net.scalenet import ScaleNetParams, ScaleNet
 from trainer.scalenettrainer import ScaleNetTrainerParams, ScaleNetTrainer
 from util.handdetector import HandDetector
 import os
-import cPickle
+import pickle
 from data.importers import NYUImporter
 from data.dataset import NYUDataset
 from util.handpose_evaluation import NYUHandposeEvaluation
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     shuffle_many_inplace([train_data, train_gt3D, train_data_com, train_data_cube, train_data_M], random_state=rng)
 
     mb = (train_data.nbytes) / (1024 * 1024)
-    print("data size: {}Mb".format(mb))
+    print(("data size: {}Mb".format(mb)))
 
     testDataSet = NYUDataset(testSeqs)
     test_data1, test_gt3D1 = testDataSet.imgStackDepthOnly('test_1')
@@ -152,8 +152,8 @@ if __name__ == '__main__':
     yend = ystart + dsize[1]
     test_data24 = test_data2[:, :, ystart:yend, xstart:xend]
 
-    print train_gt3D.max(), test_gt3D1.max(), train_gt3D.min(), test_gt3D1.min()
-    print train_data.max(), test_data1.max(), train_data.min(), test_data1.min()
+    print(train_gt3D.max(), test_gt3D1.max(), train_gt3D.min(), test_gt3D1.min())
+    print(train_data.max(), test_data1.max(), train_data.min(), test_data1.min())
 
     imgSizeW = train_data.shape[3]
     imgSizeH = train_data.shape[2]
@@ -217,7 +217,7 @@ if __name__ == '__main__':
     joints = []
     gt3D.extend([j.gt3Dorig[di.crop_joint_idx].reshape(1, 3) for j in testSeqs[0].data])
     jts = poseNet.computeOutput([test_data1, test_data12, test_data14])
-    for i in xrange(test_data1.shape[0]):
+    for i in range(test_data1.shape[0]):
         joints.append(jts[i].reshape(1, 3)*(testSeqs[0].config['cube'][2]/2.) + testSeqs[0].data[i].com)
 
     gt3D.extend([j.gt3Dorig[di.crop_joint_idx].reshape(1, 3) for j in testSeqs[1].data])
@@ -227,12 +227,12 @@ if __name__ == '__main__':
 
     hpe = NYUHandposeEvaluation(gt3D, joints)
     hpe.subfolder += '/'+eval_prefix+'/'
-    print("Mean error: {}mm, max error: {}mm".format(hpe.getMeanError(), hpe.getMaxError()))
+    print(("Mean error: {}mm, max error: {}mm".format(hpe.getMeanError(), hpe.getMaxError())))
 
     # save results
-    cPickle.dump(joints, open("./eval/{}/result_{}_{}.pkl".format(eval_prefix,os.path.split(__file__)[1],eval_prefix), "wb"), protocol=cPickle.HIGHEST_PROTOCOL)
+    pickle.dump(joints, open("./eval/{}/result_{}_{}.pkl".format(eval_prefix,os.path.split(__file__)[1],eval_prefix), "wb"), protocol=pickle.HIGHEST_PROTOCOL)
 
-    print "Testing baseline"
+    print("Testing baseline")
 
     #################################
     # BASELINE
@@ -241,11 +241,11 @@ if __name__ == '__main__':
 
     hpe_base = NYUHandposeEvaluation(gt3D, numpy.asarray(data_baseline)[:, di.crop_joint_idx, :].reshape((len(gt3D), 1, 3)))
     hpe_base.subfolder += '/'+eval_prefix+'/'
-    print("Mean error: {}mm".format(hpe_base.getMeanError()))
+    print(("Mean error: {}mm".format(hpe_base.getMeanError())))
 
     com = [j.com for j in testSeqs[0].data]
     com.extend([j.com for j in testSeqs[1].data])
     hpe_com = NYUHandposeEvaluation(gt3D, numpy.asarray(com).reshape((len(gt3D), 1, 3)))
     hpe_com.subfolder += '/'+eval_prefix+'/'
-    print("Mean error: {}mm".format(hpe_com.getMeanError()))
+    print(("Mean error: {}mm".format(hpe_com.getMeanError())))
 

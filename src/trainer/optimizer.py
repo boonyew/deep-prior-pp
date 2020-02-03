@@ -53,7 +53,7 @@ class Optimizer(object):
         self.shared = []
 
         if len(grads) != len(params):
-            print "Warning: Size of gradients ({}) does not fit size of parameters ({})!".format(len(grads), len(params))
+            print("Warning: Size of gradients ({}) does not fit size of parameters ({})!".format(len(grads), len(params)))
 
     def ADAM(self, learning_rate=0.0002, beta1=0.9, beta2=0.999, epsilon=1e-8, gamma=1-1e-8):
         """
