@@ -23,7 +23,7 @@ along with DeepPrior.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy
-from data.importers import NYUImporter, ICVLImporter, MSRA15Importer
+from data.importers import NYUImporter, ICVLImporter, MSRA15Importer,IntelImporter
 
 
 __author__ = "Paul Wohlhart <wohlhart@icg.tugraz.at>, Markus Oberweger <oberweger@icg.tugraz.at>"

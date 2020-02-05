@@ -340,6 +340,7 @@ class HandDetector(object):
         :param sz: size
         :return: resized image
         """
+        sz = (int(sz[0]),int(sz[1]))
         if self.resizeMethod == self.RESIZE_CV2_NN:
             rz = cv2.resize(crop, sz, interpolation=cv2.INTER_NEAREST)
         elif self.resizeMethod == self.RESIZE_BILINEAR:

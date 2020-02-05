@@ -25,12 +25,12 @@ if __name__ == '__main__':
     aug_modes = ['com', 'rot', 'none']  # 'sc',
 
     di = IntelImporter('../data/intel/')
-    Seq2 = di.loadSequence('test_seq', docom=True)
+    Seq2 = di.loadSequence('test_seq2', docom=True)
     testSeqs = [Seq2]
 
     # Create testing data
     testDataSet = IntelDataset(testSeqs)
-    test_data, test_gt3D = testDataSet.imgStackDepthOnly('test_seq')
+    test_data, test_gt3D = testDataSet.imgStackDepthOnly('test_seq2')
 
     val_data = test_data
     val_gt3D = test_gt3D

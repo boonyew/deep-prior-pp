@@ -1332,8 +1332,8 @@ class IntelImporter(DepthImporter):
         self.refineNet = refineNet
         self.default_cubes = {'train': (250, 250, 250),
                               'test_seq_1': (250, 250, 250),
-                              'test_seq_2': (250, 250, 250)}
-        self.sides = {'train': 'right', 'test_seq1': 'right', 'test_seq_2': 'right'}
+                              'test_seq2': (250, 250, 250)}
+        self.sides = {'train': 'right', 'test_seq1': 'right', 'test_seq2': 'right'}
 
     def loadDepthMap(self, filename):
         """
@@ -1441,9 +1441,9 @@ class IntelImporter(DepthImporter):
         self.loadRefineNetLazy(self.refineNet)
 
         # Load the dataset
-        objdir = '{}/Depth/'.format(self.basepath)
+        objdir = '{}/test_seq2'.format(self.basepath)
         # trainlabels = '{}/{}.txt'.format(self.basepath, seqName)
-        trainlabels = 'labels.txt'
+        trainlabels = '{}/test_seq2/centers.txt'.format(self.basepath)
 
         inputfile = open(trainlabels)
         
@@ -1462,7 +1462,7 @@ class IntelImporter(DepthImporter):
             # Split row in text file by spaces
             part = line.split(' ')
             # check for subsequences and skip them if necessary
-            # subSeqName = ''
+            subSeqName = ''
             if subSeq is not None:
                 p = part[0].split('/')
                 # handle original data (unrotated '0') separately
@@ -1500,8 +1500,8 @@ class IntelImporter(DepthImporter):
             gtorig = np.zeros((self.numJoints, 3), np.float32)
             for joint in range(self.numJoints):
                 for xyz in range(0, 3):
-                    gtorig[joint, xyz] = part[joint*3+xyz+1]
-
+                    # gtorig[joint, xyz] = part[joint*3+xyz+1]
+                    gtorig[joint,xyz] = 150
             # normalized joints in 3D coordinates
             gt3Dorig = self.jointsImgTo3D(gtorig)
             # print gt3D
